@@ -34,13 +34,11 @@ function requisitarApi() {
   client.request.get("https://claracloud.freshservice.com/api/v2/tickets")
     .then(
       {
-        "status" : 200,
         "headers":
         {
           "Content-Type": "application/json",
           "Authorization": "Basic " + "dHZlNlZrN3NyOXk4a2FzVXB2eQ=="  
         },
-        body: "",
         maxAttempts: 5    
       },
         function(error) {
