@@ -30,37 +30,84 @@ function mostrarModal1() {
     template: "modal1.html"
   });
 }
-
-function mostrarModal2() {
-  client.interface.trigger("showModal", {
-    title: "Modal 2",
-    template: "modal2.html"
-  });
+function requisitarApi() {
+  client.request.get("https://claracloud.freshservice.com/api/v2/tickets")
+    .then(
+      {
+        "status" : 200,
+        "headers":
+        {
+          "Content-Type": "application/json",
+          "Authorization": "Basic " + "dHZlNlZrN3NyOXk4a2FzVXB2eQ=="  
+        },
+        body: "",
+        maxAttempts: 5    
+      },
+        function(error) {
+            console.log("Não..", error)
+        }
+    );
 }
+//window.frsh_init().then((client) => popupar(client));
 
-function mostrarModal3() {
-  client.interface.trigger("showModal", {
-    title: "Modal 3",
-    template: "modal3.html"
-  });
-}
-
-function mostrarModal4() {
-  client.interface.trigger("showModal", {
-    title: "Modal 4",
-    template: "modal4.html"
-  });
-}
-
-function popupar() {
+function alertar() {
   client.interface.trigger("showConfirm", {
-    title: "Sample Confirm",
-    message: "Are you sure you want to close this ticket?"
+    title: "Exemplo!",
+    message: "Este é um exemplo de Alert com dois botões!"
   /*"title" and "message" should be plain text.*/
   }).then(function(result) {
   /* "result" will be either "Save" or "Cancel" */
   }).catch(function(error) {
-  // error - error object;
+    console.log("Algo de errado não deu certo", error)
+  });
+}
+
+function popupar() {
+  client.interface.trigger("showNotify", {
+    type: "success",
+//    title: "Sucesso!",
+    message: "Popup de Sucesso!"
+  /* The "message" should be plain text */
+  }).then(function(data) {
+  // data - success message
+  }).catch(function(error) {
+  // error - error object
+  });
+}
+
+function popupar2() {
+  client.interface.trigger("showNotify", {
+    type: "info",
+//    title: "Sucesso!",
+    message: "Popup de Info"
+  }).then(function(data) {
+  // data - success message
+  }).catch(function(error) {
+  // error - error object
+  });
+}
+
+function popupar3() {
+  client.interface.trigger("showNotify", {
+    type: "warning",
+//    title: "Sucesso!",
+    message: "Popup de Aviso..."
+  }).then(function(data) {
+  // data - success message
+  }).catch(function(error) {
+  // error - error object
+  });
+}
+
+function popupar4() {
+  client.interface.trigger("showNotify", {
+    type: "danger",
+//    title: "Sucesso!",
+    message: "Popup de Perigo."
+  }).then(function(data) {
+  // data - success message
+  }).catch(function(error) {
+  // error - error object
   });
 }
 

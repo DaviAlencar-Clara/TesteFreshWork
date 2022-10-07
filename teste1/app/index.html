@@ -12,24 +12,35 @@
 
   <body>
     <div class="main">
-      <p>Utilize this template code to build your App</p>
+      <p>Exemplos de métodos de interface para seu app!</p>
       <p id="apptext"></p>
 
       <div class="squareMaster">
         <p>$</p>
       </div>
       <div class="squares">
-        <div class="square" id="a" onclick={mostrarModal2()}>
+        <div class="square" id="a" onclick={alertar()}>
           <p>Alert</p>
         </div>
-        <div class="square" id="b" onclick={mostrarModal3()}>
-          <p>Popup</p>
-        </div>
-        <div class="square" id="c" onclick={mostrarModal4()}>
+        <div class="square" id="c" onclick={requisitarApi()}>
           <p>API</p>
         </div>
         <div class="square" id="d" onclick={mostrarModal1()}>
-          <p>+Bônus</p>
+          <p>Modal</p>
+        </div>
+      </div>
+      <div class="squares">
+        <div class="square" id="b" onclick={popupar()}>
+          <p>Pop 1</p>
+        </div>
+        <div class="square" id="b" onclick={popupar2()}>
+          <p>Pop 2</p>
+        </div>
+        <div class="square" id="b" onclick={popupar3()}>
+          <p>Pop 3</p>
+        </div>
+        <div class="square" id="b" onclick={popupar4()}>
+          <p>Pop 4</p>
         </div>
       </div>
     </div>
