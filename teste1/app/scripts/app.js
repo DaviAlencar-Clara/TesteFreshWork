@@ -7,7 +7,7 @@ async function init() {
   client.events.on('app.activated', renderText);
 }
 
-async function renderText() {
+async function renderizarNome() {
   const textElement = document.getElementById('apptext');
   const contactData = await client.data.get('contact');
   const {
@@ -31,31 +31,94 @@ function mostrarModal1() {
   });
 }
 function requisitarApi() {
-  client.request.get("https://claracloud.freshservice.com/api/v2/tickets")
+  client.request.get("https://democlaracloud.freshdesk.com/api/v2/tickets/2673", {
+    headers:
+    {
+      "Content-Type": "application/json",
+      "Authorization": "Basic " + "QmpES1ladk52N2wyWkpYbmtDSlo="
+    },
+  })
     .then(
-      {
-        "headers":
-        {
-          "Content-Type": "application/json",
-          "Authorization": "Basic " + "dHZlNlZrN3NyOXk4a2FzVXB2eQ=="  
-        },
-        maxAttempts: 5    
+      function (data) {
+        client.interface.trigger("showModal", {
+          title: "A",
+          template: "modal1.html"
+        });
+
+        let assunto = data.ticket.subject
+
+        let substituirTxt = document.getElementById("id")
+
+        substituirTxt.innerHTML = `O assunto deste ticket (de acordo com a API) é: ${assunto}`
+
+        //console.log("deu bom", succ)
       },
-        function(error) {
-            console.log("Não..", error)
-        }
+      function (error) {
+        console.log("nani", error)
+      }
     );
 }
+
+function requisitarStatus() {
+  client.data.get("ticket").then(
+    function (data) {
+      let converterNome = data.ticket.status == 2 ? "Aberto" :
+      data.ticket.status == 3 ? "Pendente" :
+      data.ticket.status == 6 ? "Aguarde Teste" :
+      data.ticket.status == 7 ? "Aguarde Terceiros" :
+      data.ticket.status == 4 ? "Resolvido" :
+      data.ticket.status == 5 ? "Fechado" : "Valor Inválido"
+
+      let substituirTxt = document.getElementById("zapato");
+
+      let tempo = new Date().toLocaleDateString()
+      let horario = new Date().toLocaleTimeString()
+
+      substituirTxt.innerHTML = `Última Requsição em: ${tempo}, às ${horario}`;
+
+      console.log(data.ticket.custom_fields)
+      client.interface.trigger("showNotify", {
+        type: "info",
+        message: "O status deste ticket é: " + converterNome
+      }).then(function (data) {
+      }).catch(function (error) {
+      })
+    },
+    function (error) {
+      console.log("nani", error)
+    }
+  );
+}
+
+function requisitarEmail() {
+  client.data.get("contact").then(
+    function (data) {
+      client.interface.trigger("showNotify", {
+        type: "info",
+        message: "Email é:" + data.contact.email
+      }).then(
+        function (succ) {
+          console.log("deu bom", succ)
+        },
+        function (error) {
+          console.log("nani", error)
+        });
+    },
+    function (erro) {
+      console.log("Ops", erro)
+    }
+  );
+}
+
 //window.frsh_init().then((client) => popupar(client));
 
 function alertar() {
   client.interface.trigger("showConfirm", {
     title: "Exemplo!",
     message: "Este é um exemplo de Alert com dois botões!"
-  /*"title" and "message" should be plain text.*/
-  }).then(function(result) {
-  /* "result" will be either "Save" or "Cancel" */
-  }).catch(function(error) {
+  }).then(function (result) {
+    /* "result" will be either "Save" or "Cancel" */
+  }).catch(function (error) {
     console.log("Algo de errado não deu certo", error)
   });
 }
@@ -63,49 +126,40 @@ function alertar() {
 function popupar() {
   client.interface.trigger("showNotify", {
     type: "success",
-//    title: "Sucesso!",
+    //    title: "Sucesso!",
     message: "Popup de Sucesso!"
-  /* The "message" should be plain text */
-  }).then(function(data) {
-  // data - success message
-  }).catch(function(error) {
-  // error - error object
+    /* The "message" should be plain text */
+  }).then(function (data) {
+    // data - success message
+  }).catch(function (error) {
+    // error - error object
   });
 }
 
 function popupar2() {
   client.interface.trigger("showNotify", {
     type: "info",
-//    title: "Sucesso!",
     message: "Popup de Info"
-  }).then(function(data) {
-  // data - success message
-  }).catch(function(error) {
-  // error - error object
+  }).then(function (data) {
+  }).catch(function (error) {
   });
 }
 
 function popupar3() {
   client.interface.trigger("showNotify", {
     type: "warning",
-//    title: "Sucesso!",
     message: "Popup de Aviso..."
-  }).then(function(data) {
-  // data - success message
-  }).catch(function(error) {
-  // error - error object
+  }).then(function (data) {
+  }).catch(function (error) {
   });
 }
 
 function popupar4() {
   client.interface.trigger("showNotify", {
     type: "danger",
-//    title: "Sucesso!",
     message: "Popup de Perigo."
-  }).then(function(data) {
-  // data - success message
-  }).catch(function(error) {
-  // error - error object
+  }).then(function (data) {
+  }).catch(function (error) {
   });
 }
 

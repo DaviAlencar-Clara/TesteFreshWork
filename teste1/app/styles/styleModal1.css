@@ -32,6 +32,14 @@ html {
     background-color: rgb(0, 0, 0);
   }
   
+  .squareMaster p {
+    color:white;
+    font-size: 10px;
+    padding-bottom: 0.5em;
+    text-align: center;
+  } 
+  
+
   .square {
     display: flex;
     justify-content: center;

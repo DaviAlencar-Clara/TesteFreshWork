@@ -10,7 +10,7 @@
       }
     }
   },
-  "whitelisted-domains": ["https://claracloud.freshservice.com"],
+  "whitelisted-domains": ["https://democlaracloud.freshdesk.com"],
   "engines": {
     "node": "14.20.1",
     "fdk": "8.6.3"

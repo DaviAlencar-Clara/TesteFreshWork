@@ -29,12 +29,21 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 4em;
-  height: 2.5em;
+  width: 6em;
+  height: 3.5em;
   border-radius: 0.2em;
-  margin-bottom: 1.5em;
+  margin-top: -1.5em;
+  border-radius: 0.2em;
+  margin-bottom: 0.5em;
   background-color: rgb(0, 0, 0);
 }
+
+.squareMaster p {
+  color:white;
+  font-size: 10px;
+  padding-bottom: 0.5em;
+  text-align: center;
+} 
 
 .square {
   display: flex;
@@ -77,6 +86,10 @@ html {
   color: rgb(179, 255, 0);
 }
 
+#e:hover {
+  color: rgba(150, 150, 150, 0.568);
+}
+
 #a {
   background-color: rgba(0, 255, 255, 0.712);
 }
@@ -90,5 +103,9 @@ html {
 }
 
 #d {
-  background-color: rgb(217, 255, 0);
+  background-color: rgb(221, 181, 0);
+}
+
+#e {
+  background-color: rgb(150, 150, 150);
 }
