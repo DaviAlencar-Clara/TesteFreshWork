@@ -2,23 +2,23 @@ var client;
 
 init();
 
-async function init() {
-  client = await app.initialized();
-  client.events.on('app.activated', renderText);
-}
+// async function init() {
+//   client = await app.initialized();
+//   client.events.on('app.activated', requisitarApi);
+// }
 
-async function renderizarNome() {
-  const textElement = document.getElementById('apptext');
-  const contactData = await client.data.get('contact');
-  const {
-    contact: { name }
-  } = contactData;
+// async function renderizarNome() {
+//   const textElement = document.getElementById('apptext');
+//   const contactData = await client.data.get('contact');
+//   const {
+//     contact: { name }
+//   } = contactData;
 
-  textElement.innerHTML = `Ticket is created by ${name}`;
+//   textElement.innerHTML = `Ticket is created by ${name}`;
 
-  client.events.on("ticket.addNote", eventCallback);
+//   client.events.on("ticket.addNote", eventCallback);
 
-}
+// }
 
 function eventCallback(event) {
   console.log(event.type + " event occurred");
@@ -41,15 +41,19 @@ function requisitarApi() {
     .then(
       function (data) {
         client.interface.trigger("showModal", {
-          title: "A",
+          title: "Modal + Api !",
           template: "modal1.html"
         });
+        console.log(data.ticket)
+        // console.log(data.ticket.subject)
+        // console.log(data.ticket.custom_fields)
 
-        let assunto = data.ticket.subject
-
+        let assunto = toString(data.ticket.subject)
         let substituirTxt = document.getElementById("id")
 
-        substituirTxt.innerHTML = `O assunto deste ticket (de acordo com a API) é: ${assunto}`
+        substituirTxt.innerHTML = `O assunto deste ticket (de acordo com a API) é: ${assunto}`;
+
+
 
         //console.log("deu bom", succ)
       },
@@ -62,26 +66,28 @@ function requisitarApi() {
 function requisitarStatus() {
   client.data.get("ticket").then(
     function (data) {
-      let converterNome = data.ticket.status == 2 ? "Aberto" :
-      data.ticket.status == 3 ? "Pendente" :
-      data.ticket.status == 6 ? "Aguarde Teste" :
-      data.ticket.status == 7 ? "Aguarde Terceiros" :
-      data.ticket.status == 4 ? "Resolvido" :
-      data.ticket.status == 5 ? "Fechado" : "Valor Inválido"
+
+      let converterTipo = data.ticket.status == 2 ? "info" :
+        data.ticket.status == 3 ? "danger" :
+          data.ticket.status == 6 || 7 ? "warning" :
+            data.ticket.status == 4 || 5 ? "success" : "info"
 
       let substituirTxt = document.getElementById("zapato");
-
       let tempo = new Date().toLocaleDateString()
       let horario = new Date().toLocaleTimeString()
 
       substituirTxt.innerHTML = `Última Requsição em: ${tempo}, às ${horario}`;
 
+      console.log(data.ticket)
       console.log(data.ticket.custom_fields)
+
       client.interface.trigger("showNotify", {
-        type: "info",
-        message: "O status deste ticket é: " + converterNome
+        type: converterTipo,
+        message: "O status deste ticket é: " + data.ticket.status_label
       }).then(function (data) {
+        console.log("Yes", data)
       }).catch(function (error) {
+        console.log("Ops", error)
       })
     },
     function (error) {
