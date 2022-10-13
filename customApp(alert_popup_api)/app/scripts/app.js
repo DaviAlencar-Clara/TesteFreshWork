@@ -2,10 +2,10 @@ var client;
 
 init();
 
-// async function init() {
-//   client = await app.initialized();
-//   client.events.on('app.activated', requisitarApi);
-// }
+async function init() {
+  client = await app.initialized();
+  client.events.on('app.activated');
+}
 
 // async function renderizarNome() {
 //   const textElement = document.getElementById('apptext');
@@ -31,7 +31,7 @@ function mostrarModal1() {
   });
 }
 function requisitarApi() {
-  client.request.get("https://democlaracloud.freshdesk.com/api/v2/tickets/2673", {
+  client.request.get("https://democlaracloud.freshdesk.com/api/v2/tickets/", {
     headers:
     {
       "Content-Type": "application/json",
@@ -39,23 +39,26 @@ function requisitarApi() {
     },
   })
     .then(
-      function (data) {
+      function (payload) {
         client.interface.trigger("showModal", {
           title: "Modal + Api !",
           template: "modal1.html"
         });
-        console.log(data.ticket)
-        // console.log(data.ticket.subject)
-        // console.log(data.ticket.custom_fields)
+        console.log("payload.data.ticket", payload)
+        // console.log("payload.data.ticket", payload.data.ticket)
+        // console.log("payload.data.ticket.subject", payload.data.ticket.subject)
+        // console.log("payload.data.subject",payload.data.subject)
+        // console.log("payload.subject",payload.subject)
+        // console.log("data.subject",data.subject)
+        // console.log("data.ticket.subject",data.ticket.subject)
+        // console.log("data.ticket.custom_fields",data.ticket.custom_fields)
 
-        let assunto = toString(data.ticket.subject)
+        let assunto = toString(payload.data.ticket.subject)
         let substituirTxt = document.getElementById("id")
 
         substituirTxt.innerHTML = `O assunto deste ticket (de acordo com a API) é: ${assunto}`;
 
-
-
-        //console.log("deu bom", succ)
+        // console.log("deu bom", succ)
       },
       function (error) {
         console.log("nani", error)

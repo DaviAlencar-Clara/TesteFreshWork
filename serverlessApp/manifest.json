@@ -9,11 +9,10 @@
         "onTicketUpdate": {
           "handler": "onTicketUpdateCallback"
         }
-
       }
     }
   },
-  "whitelisted-domains": [],
+  "whitelisted-domains": ["https://democlaracloud.freshdesk.com"],
   "engines": {
     "node": "14.20.1",
     "fdk": "8.6.3"

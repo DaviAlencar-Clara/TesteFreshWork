@@ -5,16 +5,46 @@ exports = {
 
 
   onTicketCreateHandler: function (args) {
-    console.log('Hello darkness ' + args['data']['requester']['name']);
+    console.log('Hello: ' + args['data']['requester']['name']);
   },
 
   onTicketUpdateCallback: function (payload) {
-    //console.log("Logging arguments from onTicketUpdate event: " + JSON.stringify(payload));
     //Finding fields that are changed
     var changes = payload.data.ticket.changes;
 
-    console.log(changes)
-    console.log("Atualizado!")
+    if(payload.data.ticket.deleted == false) {
+      console.log("Atualizado!", changes) 
+    } else if (payload.data.ticket.deleted == true) {
+      console.log('Ticket: "',payload.data.ticket.subject,'" foi deletado... Seu status era: ', payload.data.ticket.status)
 
-  }
+      if (payload.data.ticket.status == 2 || payload.data.ticket.status == 3) {
+        $request.post("https://democlaracloud.freshdesk.com/api/v2/tickets"), {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Basic" + " QmpES1ladk52N2wyWkpYbmtDSlo="
+          },
+          body: JSON.stringify({
+             "description": "Ticket criado!", 
+             "subject": "Ticket deletado indevidamente...", 
+             "email": "teste@teste.com", 
+             "email_config_id": 1,
+             "priority": 1, 
+             "status": 2
+          })
+        }
+        console.log('Atenção! Ticket com valor "ABERTO/PENDENTE" excluído. Criando ticket de notificação por fechamento indevido!')
+      } else {
+        console.log("Ticket ",payload.data.ticket.id," deletado com sucesso!")
+      }
+    } else {
+      console.log("Erro", payload.data.ticket.id, payload.data.ticket.deleted)
+    }
+       
+
+    
+
+
+
+    // 2=open 3=Pending 6,7= Aguardando 4,5=Resolvido, Fechado
+  },
 };
