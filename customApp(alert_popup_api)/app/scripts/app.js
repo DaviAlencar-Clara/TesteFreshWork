@@ -30,8 +30,31 @@ function mostrarModal1() {
     template: "modal1.html"
   });
 }
+
+function requisitarApi2() {
+  client.data.get("ticket")
+    .then(
+      function (data) {
+        client.interface.trigger("showModal", {
+          title: "Modal + Api !",
+          template: "modal1.html"
+        });
+        
+        console.log("payload.data.ticket", data.ticket.subject)
+        let assunto = data.ticket.subject
+        let substituirTxt2 = document.getElementById("teste")
+
+        substituirTxt2.innerHTML = `O assunto deste ticket (de acordo com a API) é: "${assunto}"`;
+
+        // console.log("deu bom", succ)
+      },
+      function (error) {
+        console.log("nani", error)
+      }
+    );
+}
 function requisitarApi() {
-  client.request.get("https://democlaracloud.freshdesk.com/api/v2/tickets/", {
+  client.request.get("https://democlaracloud.freshdesk.com/api/v2/tickets?filter=new_and_my_open", {
     headers:
     {
       "Content-Type": "application/json",
@@ -44,17 +67,20 @@ function requisitarApi() {
           title: "Modal + Api !",
           template: "modal1.html"
         });
-        console.log("payload.data.ticket", payload)
-        // console.log("payload.data.ticket", payload.data.ticket)
-        // console.log("payload.data.ticket.subject", payload.data.ticket.subject)
-        // console.log("payload.data.subject",payload.data.subject)
-        // console.log("payload.subject",payload.subject)
-        // console.log("data.subject",data.subject)
-        // console.log("data.ticket.subject",data.ticket.subject)
-        // console.log("data.ticket.custom_fields",data.ticket.custom_fields)
-
-        let assunto = toString(payload.data.ticket.subject)
-        let substituirTxt = document.getElementById("id")
+        console.log("payload", JSON.parse(payload.response))
+        console.log("payload", payload)
+        // (chave para filtro de todos tickets para custom app api)
+        let ticket = client.data.get("ticket")
+        let assunto = JSON.parse(payload.response).filter(i => {
+          if(i.id === ticket.id) {
+            console.log("Sucesso")
+            assunto = payload.response.subject
+          } else {
+            console.log("Erro")
+          }
+        })
+        
+        let substituirTxt = document.getElementById("teste")
 
         substituirTxt.innerHTML = `O assunto deste ticket (de acordo com a API) é: ${assunto}`;
 

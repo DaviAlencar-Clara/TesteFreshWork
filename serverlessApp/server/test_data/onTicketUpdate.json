@@ -22,8 +22,9 @@
         "ram@freshdesk.com",
         "diana@freshdesk.com"
       ],
-      "reply_cc_emails": [
+      "cc_emails": [
         "ram@freshdesk.com",
+        "bot.autodelete@gmail.com.br",
         "diana@freshdesk.com"
       ],
       "email_config_id": 77123,
@@ -32,15 +33,11 @@
       "company_id": 2,
       "requester_id": 129,
       "responder_id": 320,
-      "status": 4,
+      "status": 2,
       "priority": 1,
       "tags": [],
       "spam": false,
       "tweet_id": null,
-      "cc_emails": [
-        "ram@freshdesk.com",
-        "diana@freshdesk.com"
-      ],
       "to_emails": null,
       "created_at": "2021-11-17T10:02:58Z",
       "updated_at": "2021-11-17T10:03:27Z",
