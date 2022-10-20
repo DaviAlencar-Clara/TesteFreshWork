@@ -18,8 +18,9 @@ async function teste() {
 
   let account = await client.data.get("sales_account")
   let idSalesAccount = account.sales_account.id
+  let nomeEmpresa = account.sales_account.name;
   console.log(account.sales_account.id);
-  requisitarServicos_ProdutosContratados(idSalesAccount)
+  requisitarServicos_ProdutosContratados(idSalesAccount, nomeEmpresa)
   
 }
 
@@ -83,25 +84,18 @@ function popupWar(mensagem) {
   });
 }
 
-// function requisitarServicos_ProdutosContratados() {
+function diffMonths(startDate) {
 
-//   let idConta;
-//   function a(payload) {
-//     let getConta = client.data.get("sales_account")
-//     console.log(payload.response)
-//     let buscaIdConta = JSON.parse(payload.response).filter(i => {
-//       if (i.id === getConta.id) {
-//         console.log("Sucesso", buscaIdConta)
-//         idConta = i.id
-//         console.log("id", idConta)
-//       } else {
-//         console.log("Erro")
-//       }
-//     })
-//   }
+  // console.log(typeof startDate);
+
+  const currentDate = new Date();
+
+  return Math.abs(startDate.getMonth() - currentDate.getMonth() +
+    (12 * (startDate.getFullYear() - currentDate.getFullYear())));
+}
 
 
-async function requisitarServicos_ProdutosContratados(id) {
+async function requisitarServicos_ProdutosContratados(id, nomeEmpresa) {
   await client.request.get(`https://claracloud.myfreshworks.com/crm/sales/api/sales_accounts/${id}?include=deals`, {
     headers: {
       "Content-Type": "application/json",
@@ -117,43 +111,72 @@ async function requisitarServicos_ProdutosContratados(id) {
       if(deals.length !== 0) {
 
         console.log(deals.length)
+        document.getElementById("ativo").innerHTML += `Olá ${nomeEmpresa} ! `
+        document.getElementById("quantia").innerHTML += `Contratos Totais: ${deals.length} | `
 
-        let contador = 0
+        let contadorDeals = 0
+        let contadorSemDeals = 0
+        let contVigentes = 0
 
         deals.forEach(i => {
-          contador = contador + 1
+          contadorDeals = contadorDeals + 1
           let nomeDeal = i.name
+      
           let quantiaDeal = i.amount
           let fechamentoPrevisto = i.expected_close
-          let dataAtual = new Date().toLocaleDateString().split('/').reverse().join('-')
+          let dataFechamento = i.closed_date
+          let dataInicio = new Date(i.custom_field.cf_data_de_incio).toLocaleDateString().split('/').reverse().join('-')
+          let dataAtual = new Date().toLocaleDateString()
+
+          
           // const offset = dataAtual.getTimezoneOffset()
           // dataAtual = new Date(dataAtual.getTime() - (offset * 60 * 1000))
           // return dataAtual.toISOString().split('T')[0]
 
-          if (fechamentoPrevisto == null) {
-            //pass
-          } else if (fechamentoPrevisto !== null) {
-            document.getElementById("mostrarTxt2").innerHTML += `<div id="txtBox"> 
-            <p class="nomeDeal"> ${nomeDeal} <p/>  
-            <p class="quantiaDeal"> $ ${quantiaDeal}  <p/> 
-            <p class="txt"> Vencido: ${dataAtual > fechamentoPrevisto} <p/> 
-            <p class="fechamentoPrevisto"> Até: ${fechamentoPrevisto.split('-').reverse().join('/')} <p/> 
-            <!-- <p class="fechamentoPrevisto"> Até: ${fechamentoPrevisto.split('-').reverse().join('/')} <p/> --!>
-            <!-- <p class="fechamentoPrevisto"> Até: ${fechamentoPrevisto.split('-').reverse().join('/')} <p/> --!>
-            <p class="ate"> Data Atual: ${dataAtual.split('-').reverse().join('/')} <p/>
-            <p class="txt"> teste: ${contador} <p/> 
-            <div/> `
+          if(dataInicio == null || dataFechamento == null) {
+            console.log("Data de Inicio ou Fechamento nulos para deal: ", contadorDeals)
+          }
+          else if(dataInicio == null && dataFechamento == null) {
+            console.log("Deal", contadorDeals, "em andamento");
           } else {
-            console.log("err")
-            popupErr("Erro de Requisição")
+            if (diffMonths(dataInicio ? new Date(dataInicio) : new Date(dataFechamento)) < 12) {
+              console.log("Vigente");
+              console.log(nomeDeal, dataInicio.split('-').reverse().join('/'), dataFechamento.split('-').reverse().join('/'));
+              
+              contVigentes += 1
+
+              if (fechamentoPrevisto == null) {
+                contadorSemDeals = contadorSemDeals + 1
+                console.log("Deal contador", contadorDeals, "sem fechamento previsto");
+                //pass
+              } else if (fechamentoPrevisto !== null) {
+    
+                document.getElementById("mostrarTxt2").innerHTML += `<div id="txtBox"> 
+                <p id="nomeDeal"> ${nomeDeal} <p/>  
+                <p id="quantiaDeal"> $ ${quantiaDeal}  <p/> 
+                <p id="txt"> Vencido: ${dataAtual > fechamentoPrevisto} <p/> 
+                <p id="fechamentoPrevisto"> Até: ${fechamentoPrevisto.split('-').reverse().join('/')} <p/> 
+                <p id="ate"> Data Atual: ${dataAtual.split('-').reverse().join('/')} <p/>
+                <p id="txt"> Contrato: ${contadorDeals} <p/>  
+                <p id="vigente"> <p/>  
+                `
+              } else {
+                console.log("err")
+                popupErr("Erro de Requisição")
+              }
+            } else if (diffMonths(dataInicio ? new Date(dataInicio) : new Date(dataFechamento)) > 12) {
+              console.log("Não vigente");
+              console.log(nomeDeal, dataInicio.split('-').reverse().join('/') , dataFechamento.split('-').reverse().join('/'));
+            } else {
+              console.log("Errado")
+            }
           }
         });
-        popupSuc("Sucesso na Requisição!")
-        // let substituirTxt = document.getElementById("mostrarTxt")
-        // let tituloServico = payload.response
 
-        // console.log("payload", payload.response)
-        // console.log("payload2", payload.response.deals)
+        document.getElementById("quantia").innerHTML += `Contratos Vigentes: ${contVigentes} `
+        // document.getElementById("quantia").innerHTML += `Contratos Vigentes: ${deals.length - contadorSemDeals} `
+
+        popupSuc("Sucesso na Requisição!")
       } else {
         console.log("Sem deals");
         popupWar("Não existem Deals")
@@ -165,3 +188,9 @@ async function requisitarServicos_ProdutosContratados(id) {
       }
     )
 }
+
+
+// popup com tipo em parametro
+// exs de css
+// listar contr
+// tratativas de erro || popups
