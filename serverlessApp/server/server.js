@@ -20,9 +20,9 @@ exports = {
       console.log("Atualizado!", changes)
     } else if (payload.data.ticket.deleted == true) {
 
-      console.log(payload.data.ticket.cc_emails)
+      console.log(payload.data.actor.email)
 
-      if (payload.data.ticket.cc_emails !== "bot.autodelete@gmail.com.br") {
+      if (payload.data.actor.email !== "bot.autodelete@gmail.com.br") {
         if (payload.data.ticket.status == 2 || payload.data.ticket.status == 3) {
           $request.post("https://democlaracloud.freshdesk.com/api/v2/tickets", {
             headers: {
@@ -34,7 +34,6 @@ exports = {
               "description": 'Ticket criado devido à exclusão anterior de ticket com valor "ABERTO/PENDENTE"!',
               "subject": `O ticket deletado tinha o assunto: ${payload.data.ticket.subject}`,
               "email": "bot.autodelete@gmail.com.br",
-              "cc_emails": ["bot.autodelete@gmail.com.br"],
               "priority": 1,
               "status": 2,
               "custom_fields": {

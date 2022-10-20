@@ -8,6 +8,11 @@ html {
   box-sizing: inherit;
 }
 
+body {
+  font-family: sans-serif;
+  font-size: 16px!important;
+}
+
 article {
   display: flex;
   flex-flow: column wrap;
@@ -19,3 +24,41 @@ section {
   padding: 1rem;
   font-family: sans-serif;
 }
+
+#txtBox p {
+  text-align: left;
+  font-size: 12px;
+  margin: 0.2em;
+}
+
+#txtBox {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 30em;
+  min-height: 10em;
+  max-height: auto;
+  margin: 1em;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  border: 1px solid #ebeff3;
+  background-color: #ffff;
+  box-shadow: 0 0 4px rgb(39 49 58 / 8%);
+}
+
+.large {
+  font-size: 16px;
+}
+.medium {
+  font-size: 14px;
+}
+
+/* #txtBox:nth-child(even) {
+  background-color: blue;
+}
+
+#txtBox:nth-child(odd) {
+  background-color: rgb(150, 150, 150);
+} */
+
+

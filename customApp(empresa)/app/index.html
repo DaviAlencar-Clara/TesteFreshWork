@@ -10,17 +10,20 @@
 <body>
   <article>
     <section>
-      This is your sample app. You can utilise this space to build your app.
       <br />
-      You can add your own element here.
+      <p id="quantia">Nome empresa, Status (ativo, inativo > 12 meses):</p>
+      <p id="quantia">Contratos abertos:</p>
       <br /><br />
-      <p id="mostrarTxt">a</p>
+      <!-- <p id="mostrarTxt">a</p> -->
+      <div class="txtBox">
+        <p id="mostrarTxt2"></p>
+      </div>
     </section>
     <section>
       <fw-button color="secondary" class="button btn-open">
         Open Modal
       </fw-button>
-      <fw-button color="secondary" class="teste" onclick={requisitarServicos_ProdutosContratados()}>
+      <fw-button color="secondary" class="teste" onclick={teste()}>
         Teste log
       </fw-button>
     </section>
