@@ -106,20 +106,20 @@ async function requisitarDeals(id, nomeEmpresa) {
           if (diffMonths(dataInicio ? new Date(dataInicio) : new Date(dataFechamento)) < 12) {
             contVigentes += 1
 
-            let html = `<div id="txtBox"> 
-                 <p id="nomeDeal"> ${nomeDeal} </p>  
-                 `
+            // let html = `<div id="txtBox"> 
+            //      <p id="nomeDeal"> ${nomeDeal} </p>  
+            //      `
 
             const respApi = await requisitarProdutos_Deals(idDeal)
-            if (respApi.temProduto == false) {
-              html += `<div class="produtos">
-                    <hr>
-                    <p class="dados">Está "deal" não possiu produtos :(</p>
-                    </div>
-                    `
-                    document.getElementById("containerDeal").innerHTML += html
-              return
-            }
+            // if (respApi.temProduto == false) {
+            //   html += `<div class="produtos">
+            //         <hr>
+            //         <p class="dados">Está "deal" não possiu produtos :(</p>
+            //         </div>
+            //         `
+            //         document.getElementById("containerDeal").innerHTML += html
+            //   return
+            // }
 
             console.log("Vigente");
             console.log(nomeDeal, dataInicio, dataFechamento);
@@ -133,18 +133,25 @@ async function requisitarDeals(id, nomeEmpresa) {
 
               console.log(respApi.temProduto);
 
-              html += `<div class="produtos">
+              let html = `<div id="txtBox"> 
+              <div class="produtos">
                 <hr>
                 <div class="produtosFlex">
+                <div class="iconeFlex"> 
+                <div class="icone">
+                </div> 
                   <div class="produtoBox"> 
                     <p class="subtitulo" id="${idProduto}">Produto</p>
                     <p class="dados">${nomeProduto}</p>
+                    <p class="oportunidades" >Oportunidades: ${idDeal}</p>
+                  </div>
                   </div>
                   <div class=posProduto>
                     <div class="quantiaBox"> 
                       <p class="subtitulo">Quantidade</p>
                       <p class="dados">${quantiaProduto}</p>
                     </div>
+
                   
                 `
 
@@ -172,11 +179,11 @@ async function requisitarDeals(id, nomeEmpresa) {
 
 
 
+              document.getElementById("containerDeal").innerHTML += html
             })
 
-            html += `</div>`
+            // html += `</div>`
 
-            document.getElementById("containerDeal").innerHTML += html
 
             return
           }
@@ -211,6 +218,11 @@ function requisitarProdutos_Deals(id) {
         const tipoDeal = JSON.parse(data.response).deal_types
 
         arrayDeals = tipoDeal.some(i => i.name.toLowerCase() == "venda adicional")
+
+        console.log(temProduto, id);
+
+
+        console.log("dentro da request", products);
 
         if (!temProduto) {
           return {

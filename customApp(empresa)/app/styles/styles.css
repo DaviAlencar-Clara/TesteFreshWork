@@ -92,12 +92,28 @@ hr {
 .dados {
   max-width: 30em;
 }
+.oportunidades {
+  font-size: 10px;
+  color: #999999;
+  padding-top: 0.3em;
+}
 .produtosFlex {
   display: flex;
   justify-content: space-between;
   /* align-items: center; */
   flex-direction: row;
   margin: 8px 0px 8px 0px;
+}
+.iconeFlex {
+  display: flex;
+  flex-direction: row;
+}
+.icone {
+  width: 2.5em;
+  height: 2.5em;
+  background-color: aqua;
+  border-radius: 10%;
+  margin-right: 0.3em;
 }
 .quantiaBox {
   display: flex;
