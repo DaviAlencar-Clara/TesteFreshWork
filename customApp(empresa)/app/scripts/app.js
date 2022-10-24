@@ -9,32 +9,22 @@ document.onreadystatechange = function () {
 
     function getClient(_client) {
       window.client = _client;
-      client.events.on('app.activated', teste);
+      client.events.on('app.activated', buscarDadosCliente);
     }
   }
 };
 
-async function teste() {
+async function buscarDadosCliente() {
 
   let account = await client.data.get("sales_account")
-  let idSalesAccount = account.sales_account.id
-  let nomeEmpresa = account.sales_account.name;
+  idSalesAccount = account.sales_account.id
+  nomeEmpresa = account.sales_account.name;
+  // let idDeal = account.sales_account.deals.id;
   console.log(account.sales_account.id);
-  requisitarServicos_ProdutosContratados(idSalesAccount, nomeEmpresa)
-  
-}
+  await requisitarDeals(idSalesAccount, nomeEmpresa)
+  document.getElementById("loading").style.display = `none`
+  // requisitarProdutos_Deals(idDeal)
 
-// function onAppActivate() {
-//   var btn = document.querySelector('.btn-open');
-//   btn.addEventListener('click', openModal);
-//   // Start writing your code...
-// }
-
-function openModal() {
-  client.interface.trigger(
-    'showModal',
-    useTemplate('Title of the Modal', './views/modal.html')
-  );
 }
 
 function useTemplate(title, template) {
@@ -48,34 +38,11 @@ function handleErr(err) {
   console.error(`Error occured. Details:`, err);
 }
 
-function popupSuc(mensagem) {
+//tipos de popup: success, info, warning, danger
+function popup(mensagem, tipo) {
   client.interface.trigger("showNotify", {
-    type: "success",
+    type: tipo,
     //    title: "Sucesso!",
-    message: mensagem
-    /* The "message" should be plain text */
-  }).then(function (data) {
-    // data - success message
-  }).catch(function (error) {
-    // error - error object
-  });
-}
-
-function popupErr(mensagem) {
-  client.interface.trigger("showNotify", {
-    type: "danger",
-    //    title: "Erro!",
-    message: mensagem
-  }).then(function (data) {
-    // data - success message
-  }).catch(function (error) {
-    // error - error object
-  });
-}
-function popupWar(mensagem) {
-  client.interface.trigger("showNotify", {
-    type: "warning",
-    //    title: "Erro!",
     message: mensagem
   }).then(function (data) {
     // data - success message
@@ -86,8 +53,6 @@ function popupWar(mensagem) {
 
 function diffMonths(startDate) {
 
-  // console.log(typeof startDate);
-
   const currentDate = new Date();
 
   return Math.abs(startDate.getMonth() - currentDate.getMonth() +
@@ -95,7 +60,7 @@ function diffMonths(startDate) {
 }
 
 
-async function requisitarServicos_ProdutosContratados(id, nomeEmpresa) {
+async function requisitarDeals(id, nomeEmpresa) {
   await client.request.get(`https://claracloud.myfreshworks.com/crm/sales/api/sales_accounts/${id}?include=deals`, {
     headers: {
       "Content-Type": "application/json",
@@ -104,93 +69,171 @@ async function requisitarServicos_ProdutosContratados(id, nomeEmpresa) {
   })
     .then(
       function (payload) {
-        let getConta = client.data.get("sales_account")
 
         const deals = JSON.parse(payload.response).deals
 
-      if(deals.length !== 0) {
+        if (deals.length == 0) {
+          console.log("Sem deals");
+          popup("Não existem Deals", "warning")
 
-        console.log(deals.length)
+          return
+        }
+
         document.getElementById("ativo").innerHTML += `Olá ${nomeEmpresa} ! `
         document.getElementById("quantia").innerHTML += `Contratos Totais: ${deals.length} | `
 
         let contadorDeals = 0
-        let contadorSemDeals = 0
         let contVigentes = 0
 
-        deals.forEach(i => {
-          contadorDeals = contadorDeals + 1
+        deals.forEach(async i => {
+          contadorDeals += 1
+
+          if (i.deal_stage_id != 16000205588 &&
+            i.deal_stage_id != 16000328219 &&
+            i.deal_stage_id != 16000328224) {
+
+            console.log("Deal", i.deal_stage_id, "em negociação/ não ganha", nomeEmpresa);
+            return
+          }
+
+          let idDeal = i.id;
           let nomeDeal = i.name
-      
-          let quantiaDeal = i.amount
-          let fechamentoPrevisto = i.expected_close
-          let dataFechamento = i.closed_date
-          let dataInicio = new Date(i.custom_field.cf_data_de_incio).toLocaleDateString().split('/').reverse().join('-')
-          let dataAtual = new Date().toLocaleDateString()
+          dataFechamento = i.closed_date
+          dataInicio = new Date(i.custom_field.cf_data_de_incio)
 
-          
-          // const offset = dataAtual.getTimezoneOffset()
-          // dataAtual = new Date(dataAtual.getTime() - (offset * 60 * 1000))
-          // return dataAtual.toISOString().split('T')[0]
+          console.log(idDeal);
 
-          if(dataInicio == null || dataFechamento == null) {
-            console.log("Data de Inicio ou Fechamento nulos para deal: ", contadorDeals)
-          }
-          else if(dataInicio == null && dataFechamento == null) {
-            console.log("Deal", contadorDeals, "em andamento");
-          } else {
-            if (diffMonths(dataInicio ? new Date(dataInicio) : new Date(dataFechamento)) < 12) {
-              console.log("Vigente");
-              console.log(nomeDeal, dataInicio.split('-').reverse().join('/'), dataFechamento.split('-').reverse().join('/'));
-              
-              contVigentes += 1
+          if (diffMonths(dataInicio ? new Date(dataInicio) : new Date(dataFechamento)) < 12) {
+            contVigentes += 1
 
-              if (fechamentoPrevisto == null) {
-                contadorSemDeals = contadorSemDeals + 1
-                console.log("Deal contador", contadorDeals, "sem fechamento previsto");
-                //pass
-              } else if (fechamentoPrevisto !== null) {
-    
-                document.getElementById("mostrarTxt2").innerHTML += `<div id="txtBox"> 
-                <p id="nomeDeal"> ${nomeDeal} <p/>  
-                <p id="quantiaDeal"> $ ${quantiaDeal}  <p/> 
-                <p id="txt"> Vencido: ${dataAtual > fechamentoPrevisto} <p/> 
-                <p id="fechamentoPrevisto"> Até: ${fechamentoPrevisto.split('-').reverse().join('/')} <p/> 
-                <p id="ate"> Data Atual: ${dataAtual.split('-').reverse().join('/')} <p/>
-                <p id="txt"> Contrato: ${contadorDeals} <p/>  
-                <p id="vigente"> <p/>  
-                `
-              } else {
-                console.log("err")
-                popupErr("Erro de Requisição")
-              }
-            } else if (diffMonths(dataInicio ? new Date(dataInicio) : new Date(dataFechamento)) > 12) {
-              console.log("Não vigente");
-              console.log(nomeDeal, dataInicio.split('-').reverse().join('/') , dataFechamento.split('-').reverse().join('/'));
-            } else {
-              console.log("Errado")
+            let html = `<div id="txtBox"> 
+                 <p id="nomeDeal"> ${nomeDeal} </p>  
+                 `
+
+            const respApi = await requisitarProdutos_Deals(idDeal)
+            if (respApi.temProduto == false) {
+              html += `<div class="produtos">
+                    <hr>
+                    <p class="dados">Está "deal" não possiu produtos :(</p>
+                    </div>
+                    `
+                    document.getElementById("containerDeal").innerHTML += html
+              return
             }
+
+            console.log("Vigente");
+            console.log(nomeDeal, dataInicio, dataFechamento);
+
+            respApi.produtos.forEach(i => {
+
+              let nomeProduto = i.nomeProduto
+              let quantiaProduto = i.quantidadeProduto
+              let idProduto = i.idProduto
+              let temProduto = i.temProduto
+
+              console.log(respApi.temProduto);
+
+              html += `<div class="produtos">
+                <hr>
+                <div class="produtosFlex">
+                  <div class="produtoBox"> 
+                    <p class="subtitulo" id="${idProduto}">Produto</p>
+                    <p class="dados">${nomeProduto}</p>
+                  </div>
+                  <div class=posProduto>
+                    <div class="quantiaBox"> 
+                      <p class="subtitulo">Quantidade</p>
+                      <p class="dados">${quantiaProduto}</p>
+                    </div>
+                  
+                `
+
+              if (dataInicio == null && dataFechamento == null || dataFechamento == null) {
+                html += `
+                  <div class="quantiaBox2"> 
+                      <p class="subtitulo">Data de Fechamento</p>
+                      <p class="dados">Deal em andamento</p>
+                    </div>
+                    </div>
+                </div>
+                  `
+                console.log("Deal", contadorDeals, "em andamento");
+              } else {
+                html += `
+                  <div class="quantiaBox2"> 
+                      <p class="subtitulo">Data de Fechamento</p>
+                      <p class="dados">${dataFechamento.split("-").reverse().join("/")}</p>
+                    </div>
+                    </div>
+                </div>
+                  `
+                console.log("Data de Inicio ou Fechamento nulos para deal: ", contadorDeals)
+              }
+
+
+
+            })
+
+            html += `</div>`
+
+            document.getElementById("containerDeal").innerHTML += html
+
+            return
           }
+          console.log("Não vigente");
+          console.log(nomeDeal, dataInicio, dataFechamento);
+
         });
 
         document.getElementById("quantia").innerHTML += `Contratos Vigentes: ${contVigentes} `
-        // document.getElementById("quantia").innerHTML += `Contratos Vigentes: ${deals.length - contadorSemDeals} `
 
-        popupSuc("Sucesso na Requisição!")
-      } else {
-        console.log("Sem deals");
-        popupWar("Não existem Deals")
-      }
-    },
+        popup("Sucesso na Requisição das Deals!", "success")
+      },
       function (err) {
         console.log("Erro", err)
-        popupErr("Erro de Requisição!")
+        popup("Erro de Requisição!", "error")
       }
     )
 }
 
+function requisitarProdutos_Deals(id) {
+  return client.request.get(`https://claracloud.myfreshworks.com/crm/sales/api/deals/${id}?include=products,deal_type,deal_pipeline`, {
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Token token=4fl9OGup3VHqavP-nk-qGQ"
+    }
+  })
+    .then(
+      function (data) {
+        const products = JSON.parse(data.response).deal.products;
+        const temProduto = JSON.parse(data.response).deal.has_products;
 
-// popup com tipo em parametro
+        const tipoDeal = JSON.parse(data.response).deal_types
+
+        arrayDeals = tipoDeal.some(i => i.name.toLowerCase() == "venda adicional")
+
+        if (!temProduto) {
+          return {
+            temProduto: false
+          }
+        }
+        return {
+          produtos: products.map(product => {
+            return {
+              idProduto: product.id,
+              nomeProduto: product.name,
+              quantidadeProduto: product.quantity
+            }
+          }),
+          temProduto: true
+        }
+      },
+      function (err) {
+        console.log("Erro", err)
+        popup("Erro de Requisição dos Produtos!", "error")
+      }
+    )
+}
+
 // exs de css
-// listar contr
-// tratativas de erro || popups
+// exp date

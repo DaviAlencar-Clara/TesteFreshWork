@@ -9,8 +9,10 @@ html {
 }
 
 body {
-  font-family: sans-serif;
+  font-family: Apple-System,Arial,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,STXihei,sans-serif;
   font-size: 16px!important;
+  
+  /* font-weight: lighter; */
 }
 
 article {
@@ -22,7 +24,6 @@ article {
 
 section {
   padding: 1rem;
-  font-family: sans-serif;
 }
 
 #txtBox p {
@@ -30,13 +31,19 @@ section {
   font-size: 12px;
   margin: 0.2em;
 }
+ /* .produtos {
+  padding: 0.5em;
+ }
+ .produtos p{
+  margin: 0.2em;
+ } */
 
 #txtBox {
   display: flex;
   justify-content: center;
   flex-direction: column;
-  width: 30em;
-  min-height: 10em;
+  width: 40em;
+  min-height: 7em;
   max-height: auto;
   margin: 1em;
   padding: 0.5em;
@@ -52,13 +59,88 @@ section {
 .medium {
   font-size: 14px;
 }
-
-/* #txtBox:nth-child(even) {
-  background-color: blue;
+.small {
+  font-size: 10px;
+  color: grey;
+  /* position: fixed; */
 }
 
-#txtBox:nth-child(odd) {
+hr {
+  border-top: 1px solid #ebeff3;
+  margin: 0;
+}
+
+#loading {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+}
+
+.produtoBox {
+  display: flex;
+  justify-content: flex-start;
+  /* align-items: center; */
+  flex-direction: column;
+}
+.subtitulo{
+  color: #999999
+}
+.dados {
+  max-width: 30em;
+}
+.produtosFlex {
+  display: flex;
+  justify-content: space-between;
+  /* align-items: center; */
+  flex-direction: row;
+  margin: 8px 0px 8px 0px;
+}
+.quantiaBox {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+}
+.quantiaBox2 {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  padding-left: 3em;
+}
+.posProduto {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-direction: row;
+}
+
+#nomeDeal {
+  font-size: 14px;
+  font-weight: bolder;
+  /* background-color: black; */
+  padding: 0em;
+
+}
+
+/* display: none 
+display block */
+
+/* #nomeDeal:nth-child(odd) {
+  background-color: blue;
+  color: white;
+  font-size: 14px;
+  font-weight: bolder;
+}
+#nomeDeal:nth-child(odd) {
   background-color: rgb(150, 150, 150);
+  color: white;
+  font-size: 14px;
+  font-weight: bolder;
 } */
 
 
