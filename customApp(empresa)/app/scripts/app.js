@@ -31,6 +31,13 @@ function handleErr(err) {
   console.error(`Error occured. Details:`, err);
 }
 
+// function redirecionarDeal() {
+//   document.getElementById("oportunidade").onclick = function () {
+//     location.href = "https://claracloud.myfreshworks.com/crm/sales/deals/16001629700";
+// };
+  
+// }
+
 //tipos de popup: success, info, warning, danger
 function popup(mensagem, tipo) {
   client.interface.trigger("showNotify", {
@@ -50,6 +57,10 @@ function diffMonths(startDate) {
 
   return Math.abs(startDate.getMonth() - currentDate.getMonth() +
     (12 * (startDate.getFullYear() - currentDate.getFullYear())));
+}
+
+function openInNewTab(url) {
+  window.open(url, '_blank').focus();
 }
 
 
@@ -95,7 +106,7 @@ async function requisitarDeals(id, nomeEmpresa) {
           dataFechamento = i.closed_date
           dataInicio = new Date(i.custom_field.cf_data_de_incio)
 
-          console.log(idDeal);
+          console.log("Id deal", idDeal);
 
           if (diffMonths(dataInicio ? new Date(dataInicio) : new Date(dataFechamento)) < 12) {
             contVigentes += 1
@@ -148,7 +159,7 @@ async function requisitarDeals(id, nomeEmpresa) {
                 </div> 
                   <div class="produtoBox" id="${idProduto}"> 
                   <p class="dados">${nomeProduto}</p>  
-                  <p class="subtitulo ${idProduto}">Oportunidades: ${idDeal}</p> 
+                  <p onclick="openInNewTab('https://claracloud.myfreshworks.com/crm/sales/deals/${idDeal}')" class="subtitulo ${idProduto}">Oportunidades: ${idDeal}</p> 
                   </div>
                   </div>
                   <div class=posProduto>

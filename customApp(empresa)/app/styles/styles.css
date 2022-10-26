@@ -106,6 +106,10 @@ hr {
 .produtoBox .dados{
   color: #2c5cc5;
 }
+.produtoBox .subtitulo:hover{
+  color: #2c5cc5;
+  cursor: pointer;
+}
 .subtitulo{
   color: #999999;
   font-size: 12px;
