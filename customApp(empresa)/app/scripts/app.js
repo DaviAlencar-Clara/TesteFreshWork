@@ -16,22 +16,15 @@ document.onreadystatechange = function () {
 
 async function buscarDadosCliente() {
 
-  let account = await client.data.get("sales_account")
-  idSalesAccount = account.sales_account.id
-  nomeEmpresa = account.sales_account.name;
+  let requisitarConta = await client.data.get("sales_account")
+  idSalesAccount = requisitarConta.sales_account.id
+  nomeEmpresa = requisitarConta.sales_account.name;
   // let idDeal = account.sales_account.deals.id;
-  console.log(account.sales_account.id);
+  console.log("Id da Sales Account:", requisitarConta.sales_account.id);
   await requisitarDeals(idSalesAccount, nomeEmpresa)
   document.getElementById("loading").style.display = `none`
   // requisitarProdutos_Deals(idDeal)
 
-}
-
-function useTemplate(title, template) {
-  return {
-    title,
-    template
-  };
 }
 
 function handleErr(err) {
@@ -129,7 +122,21 @@ async function requisitarDeals(id, nomeEmpresa) {
               let idProduto = i.idProduto
               let temProduto = i.temProduto
 
+              let iniciaisProdutos = nomeProduto.charAt(0)
+              iniciaisProdutos += nomeProduto.charAt(1).toLowerCase()
+
               console.log("Tem produto?", temProduto);
+
+              if (temBase == true || temVendaAdicional == true) {
+                console.log("array yes", nomeProduto);
+                if (document.getElementById(idProduto)) {
+                  document.getElementsByClassName(`subtitulo ${idProduto}`).innerHTML +=`, ${idDeal}`
+                } else {
+                  console.log("idproduto nao");
+                }
+              } else {
+                console.log("array no");
+              }
 
               let html = `<div id="txtBox"> 
               <div class="produtos">
@@ -137,17 +144,17 @@ async function requisitarDeals(id, nomeEmpresa) {
                 <div class="produtosFlex">
                 <div class="iconeFlex"> 
                 <div class="icone">
+                <p class="inicialPr"> ${iniciaisProdutos} </p>
                 </div> 
-                  <div class="produtoBox"> 
-                   <p class="subtitulo" id="${idProduto}">Produto</p> 
-                    <p class="dados">${nomeProduto}</p> 
-                    <!-- <p class="oportunidades" id="${idProduto}>Oportunidades: ${idDeal}</p> -->
+                  <div class="produtoBox" id="${idProduto}"> 
+                  <p class="dados">${nomeProduto}</p>  
+                  <p class="subtitulo ${idProduto}">Oportunidades: ${idDeal}</p> 
                   </div>
                   </div>
                   <div class=posProduto>
                     <div class="quantiaBox"> 
                       <p class="subtitulo">Quantidade</p>
-                      <p class="dados">${quantiaProduto}</p>
+                      <p class="dados ${idProduto}">${quantiaProduto}</p>
                     </div>
                 `
               if (dataInicio == null && dataFechamento == null || dataFechamento == null) {
@@ -174,16 +181,6 @@ async function requisitarDeals(id, nomeEmpresa) {
 
               document.getElementById("containerDeal").innerHTML += html
 
-              if (temBase == true || arrayDeals == true) {
-                console.log("array yes", nomeProduto);
-                if (document.getElementById(idProduto)) {
-                  console.log("idproduto yes");
-                } else {
-                  console.log("idproduto nao");
-                }
-              } else {
-                console.log("array no");
-              }
             })
             document.getElementById("quantia").innerHTML += `Total Produtos: ${contProdutos} |`
 
@@ -202,7 +199,7 @@ async function requisitarDeals(id, nomeEmpresa) {
         if (document.getElementById("containerDeal").innerHTML.length == 0) {
           document.getElementById("containerDeal").innerHTML = `<div class="produtos">
             <hr>
-            <p class="dados">Está empresa não possui negociações ativas! </p>
+            <p class="introducaoFlex">Está empresa não possui negociações ativas! </p>
             </div>
             `
         }
@@ -269,6 +266,7 @@ function requisitarProdutos_Deals(id) {
 // total produtos de base
 // var quantidade + quantidade
 //pipeline = sko(?)
+// data de renovação
 
 
 
