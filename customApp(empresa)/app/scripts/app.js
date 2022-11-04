@@ -1,5 +1,6 @@
 var client;
 
+// Ao iniciar, renderiza app e primeira função
 document.onreadystatechange = function () {
   if (document.readyState === 'interactive') renderApp();
   function renderApp() {
@@ -14,13 +15,8 @@ document.onreadystatechange = function () {
   }
 };
 
-function mostrarModal1() {
-  client.interface.trigger("showModal", {
-    title: "Modal 1",
-    template: "views/modal.html"
-  });
-}
-
+// Formatar data
+//======================================================================
 function padTo2Digits(num) {
   return num.toString().padStart(2, '0');
 }
@@ -32,39 +28,39 @@ function formatDate(date) {
     date.getFullYear(),
   ].join('/');
 }
+//========================================================================**/
 
-//Todas requisições em relação ao cliente passam aqui
 async function buscarDadosCliente() {
+  //Requisição busca dados cliente
   let requisitarConta = await client.data.get("sales_account")
   idSalesAccount = requisitarConta.sales_account.id
   nomeEmpresa = requisitarConta.sales_account.name;
-  // let idDeal = account.sales_account.deals.id;
   console.log("Id da Sales Account:", requisitarConta.sales_account.id);
+
+  //Armazena dados deal pelo usuário pesquisado
   const deals = await requisitarDeals(idSalesAccount, nomeEmpresa)
   await requisitarProdutos_Deals(deals)
 
+  //Renderiza Html + funções ao terminar de buscar esses dados
   renderizarHtml(deals)
 }
 
-// function findDuplicates(arr) {
-//   arr.filter((item, index) => arr.indexOf(item) != index)
-// }
-
-let findDuplicates = arr => arr.filter((item, index) => arr.indexOf(item) != index)
-
+//Renderiza Html + funções
 function renderizarHtml(deals) {
 
-  // console.log("wow", deals);
-
+  //Renderizam nome, e quantia de Contratos 
   document.getElementById("ativo").innerHTML += `Olá ${nomeEmpresa} ! `
   document.getElementById("quantia").innerHTML += `Contratos Totais: ${deals.length} | `
 
+  //Tratativa para caso não existam Contratos, retornando mensagem indicando o mesmo
   if (deals.length == 0) {
     console.log("Sem deals");
     popup("Não existem Deals", "warning")
 
+    //Insere status do Cliente
     document.getElementById("ativo").innerHTML += `Você é um excrente! `
 
+    //Insere Html ao App
     let html = `<div id="txtBox"> 
         <div class="introducaoFlex">
           <p class="triste">:( </p>
@@ -78,22 +74,25 @@ function renderizarHtml(deals) {
     return
   }
 
-
-
+  //contadores
   let contadorDeals = 0
   let contVigentes = 0
   let contProdutos = 0
+
+  //arrays
   var array = []
   var arr = [];
+
+  //datas
   var date = new Date();
   var current_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
   var diffdate = new Date(current_date);
 
-
-
+  //Para cada Contrato, faz os comandos abaixo 
   deals.forEach(async j => {
     contadorDeals++;
 
+    //Dados trazidos pela requisição API requisitarDeals()
     let idDeal = j.idDeal,
       nomeDeal = j.nomeDeal,
       dataInicio = j.dataInicio,
@@ -101,76 +100,55 @@ function renderizarHtml(deals) {
       estagioValidoContrato = j.estagioValidoContrato,
       temVendaAdicional = j.temVendaAdicional
 
+    //Tratativa para caso estágio do Contrato não seja -, - e -, retornando mensagem indicando o mesmo
     if (!estagioValidoContrato) {
       console.log("Deal em negociação/ não ganha", nomeDeal);
       return
     }
 
+    //Tratativa para somente listar produtos caso seja vigente (menos de 12 meses) 
     if (mesesContrato < 12) {
 
-      if (!j.temProduto) {
-        //pass
-        return
-      }
+      //Tratativa para caso Contrato não tiver Produto, não imprimí-lo
 
-      contVigentes += 1
+      contVigentes++
 
+      //Armazena dados dos Produtos de cada Contrato
       const produtos = j.produtos
 
       console.log("Vigente", nomeDeal, dataInicio);
 
-
-      // var tal = produtos.map(k => {
-      //   var array = []
-      //   return {array: k.idProduto}
-      // }, [])
-
-      // console.log("talll", tal);
-
+      //Para cada Produto num Contrato, faz os comandos abaixo 
       produtos.forEach(i => {
-        contProdutos += 1
+        contProdutos++
 
-        let nomeProduto = i.nomeProduto
-        let quantiaProduto = i.quantidadeProduto
-        let idProduto = i.idProduto
+        //Dados trazidos pela requisição API requisitarProdutos_Deals()
+        let nomeProduto = i.nomeProduto,
+          quantiaProduto = i.quantidadeProduto,
+          idProduto = i.idProduto
 
-        // var array = []
-        array.push(idProduto, `${idDeal}`)
-        // array += idProduto + " "
-        console.log("arrayPro", array);
-
-
-        findDuplicates(array) // All duplicates
-        console.log("ArrayDuplo", findDuplicates(array)) // All duplicates
-        // console.log("ArrayDuplo", [...new Set(findDuplicates(array))]) // Unique duplicates
-
-        console.log("TemVenda", temVendaAdicional);
-
+        //Formata 2 primeiras letras do produto para inserir no ícone
         let iniciaisProdutos = nomeProduto.charAt(0)
         iniciaisProdutos += nomeProduto.charAt(1).toLowerCase()
 
-        // idProduto.forEach(l => {
-        //   document.getElementById(idProduto) == l.idProduto ? console.log("id produto sim") :
-        //   document.getElementById(idProduto) != l.idProduto ? console.log("id produto não") :
-        //   console.log("erro verificação id produto");
-        // })
+        //Insere a Data de todos Contratos numa var
+        arr.push(dataInicio)
 
-        console.log("Tem produto?", i.temProduto);
-
+        //Caso Produto possua Venda Adicional, faz os comandos abaixo
         if (temVendaAdicional == true) {
-          console.log("array yes", nomeProduto);
 
-          console.log("uooou", document.getElementById(idProduto));
+          //Caso qualquer elemento HTML tenha um id="" igual à um id de um Produto, faz os comandos abaixo
           if (document.getElementById(idProduto)) {
+
+            //Armazena dados(quantidade de um produto) do primeiro elemento específico (1o produto com venda adicional, 
+            // para agregar todos os outros à ele) com id="" do id Produto 
             let quantiaTxt = document.getElementsByClassName(`dados quantia ${idProduto}`)[0].innerHTML;
 
-            console.log("quantidadeeeeee", document.getElementsByClassName(`dados quantia ${idProduto}`)[0].innerHTML);
-            console.log("resultadoododo", eval(Number(quantiaTxt) + Number(quantiaProduto)));
-
+            //Insere no HTML a soma da quantia de produtos do primeiro produto (var quantiaTxt) com todos os outros,
+            // já que var quantiaProduto está num loop, retornando o valor de todos produtos
             document.getElementsByClassName(`dados quantia ${idProduto}`)[0].innerHTML = eval(Number(quantiaTxt) + Number(quantiaProduto))
 
-            console.log("uooou", document.getElementsByClassName(`subtitulo ${idProduto}`));
-
+            //Insere no HTML do primeiro Produto um link p/ os outros Contratos que adicionaram mais do mesmo Produto
             document.getElementsByClassName(`subtitulo ${idProduto}`)[0].innerHTML += ", " + `<a href='https://claracloud.myfreshworks.com/crm/sales/deals/${idDeal}' target="_blank">${idDeal}</a>`
 
             return;
@@ -182,26 +160,7 @@ function renderizarHtml(deals) {
           console.log("array no");
         }
 
-        arr.push(dataInicio)
-
-        // const num = 10;
-        // const buildString = (num = 1) => {
-
-        //   let res = '';
-        //   for (let i = 0; i < num; i++) {
-
-        //     if (i % 2 === 0) {
-
-        //       res += 1;
-        //     } else {
-
-        //       res += 0;
-        //     };
-        //   };
-        //   return res;
-        // };
-        // console.log(buildString(num));
-
+        //Armazena o corpo do HTML e os dados do Produto na var html
         let html = `<div id="txtBox"> 
         <div class="produtos" id="${idProduto}">
           <div class="produtosFlex">
@@ -227,52 +186,29 @@ function renderizarHtml(deals) {
             </div>
         </div>
         <hr>
-
           `
-        // if (dataInicio == null && dataFechamento == null) {
-        //   html += `
-        //     <div class="quantiaBox2"> 
-        //         <p class="subtitulo">Data de Inicio</p>
-        //         <p class="dados">Não consta</p>
-        //       </div>
-        //       </div>
-        //   </div>
-        //     `
-        // } else if (dataInicio == formatDate(new Date(j.closed_date))) {
-        //   html += `
-        //   <div class="quantiaBox2"> 
-        //       <p class="subtitulo">Data de Fechamento</p>
-        //       <p class="dados">${dataInicio}</p>
-        //     </div>
-        //     </div>
-        // </div>
-        //   `
-
-        // } else {
-        //   html += `
-        //     <div class="quantiaBox2"> 
-        //         <p class="subtitulo">Data de Inicio</p>
-        //         <p class="dados">${dataInicio}</p>
-        //       </div>
-        //       </div>
-        //   </div>
-        //     `
-        // }
+      //Insere conteúdo da var html num elementp deste arquivo Js, no index.html
         document.getElementById("containerDeal").innerHTML += html
+
+        //Fim do Produtos.forEach
       })
-
       return
+      //Fim dos Contratos Vigentes
     }
-
+    
     console.log("Não vigente", nomeDeal, dataInicio);
+
+    //Fim do Deals.forEach
   });
+
+  //Com todas datas dos Produtos de um Contrato armazenados, organiza os de mais antiga, para maus recente data
   arr.sort(function (a, b) {
     var distancea = Math.abs(diffdate - a);
     var distanceb = Math.abs(diffdate - b);
     return distancea - distanceb; // sort a before b when the distance is smaller
   });
 
-
+  //Verifica a data do contrato mais recente e, se passado 1 ano comparado à hoje, imprime Ex-Cliente, senão, Cliente
   if (diffMonths(new Date(arr[0])) > 12 || typeof arr[0] == 'undefined') {
     document.getElementById("ativo").innerHTML += `Você é um excrente! `
     console.log("excrente", arr[0]);
@@ -280,25 +216,25 @@ function renderizarHtml(deals) {
     document.getElementById("ativo").innerHTML += `Você é um crente!`
     console.log("crente", arr[0]);
   }
-
+  
+  //Se não ouver Produtos em nenhum Contrato, imprime o mesmo
   if (document.getElementById("containerDeal").innerHTML == "" && contProdutos == 0) {
     document.getElementById("containerDeal").innerHTML = `<div id="txtBox"> 
-        <div class="introducaoFlex">
+    <div class="introducaoFlex">
           <p class="triste">:( </p>
           <p class="introducaoFlex">${nomeEmpresa} não possui negociações ativas!</p>
           </div> `
     pararLoading()
     return
   }
-
+  
+  //Imprime quantos Contratos/Contratos Vigentes
   document.getElementById("quantia").innerHTML += `Contratos Vigentes: ${contVigentes} | Total Produtos: ${contProdutos}`;
-
-
-  console.log("Length da quantia", document.getElementById("quantia"))
 
   popup("Sucesso na Requisição das Deals!", "success")
 
   pararLoading()
+
   return
 }
 
@@ -344,8 +280,6 @@ async function requisitarProdutos_Deals(deals) {
       .then(
         function (data) {
           const products = JSON.parse(data.response).deal.products;
-          const temProduto = JSON.parse(data.response).deal.has_products;
-
           const tipoDeal = JSON.parse(data.response).deal_types
           const canoDeal = JSON.parse(data.response).deal_pipelines
 
@@ -356,13 +290,7 @@ async function requisitarProdutos_Deals(deals) {
             deal.temVendaAdicional = false
           }
 
-          // console.log("Tem produto? e Id", temProduto, id);
           console.log("dentro da request", products);
-
-          if (!temProduto) {
-            deal.temProduto = false
-            return
-          }
 
           //obj.atributo <- quando não existente, é criado
           deal.produtos = products.map(product => {
@@ -372,7 +300,6 @@ async function requisitarProdutos_Deals(deals) {
               quantidadeProduto: product.quantity
             }
           })
-          deal.temProduto = true
         },
         function (err) {
           console.log("Erro", err)
@@ -416,14 +343,6 @@ function diffMonths(startDate) {
 
   return Math.abs(startDate.getMonth() - currentDate.getMonth() +
     (12 * (startDate.getFullYear() - currentDate.getFullYear())));
-}
-
-function openInNewTab(url) {
-  window.open(url, '_blank').focus();
-}
-
-function teste(resultado) {
-  resultado = document.getElementById("quantia").innerText
 }
 
 // total produtos de base
